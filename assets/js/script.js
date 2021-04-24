@@ -1,4 +1,7 @@
-var weatherData = "";
+var searchHistory = [1,2,3,4,5]
+var cityName = "";
+var currentInfoContainerEl = document.getElementById("currentInfo")
+var recentSearchContainerEl = document.getElementById('cityStorage')
 
 $('#submitSearch').on('click', function(event) {
     event.preventDefault();
@@ -26,6 +29,9 @@ function coordinateFinder(searchInput) {
         var lat = data.coord.lat
         var lon = data.coord.lon
         
+        cityName = data.name
+        recentSearchHistory(searchInput)
+        
         weatherCall(lat, lon);
     })
     .catch(function(error) {
@@ -45,20 +51,51 @@ function weatherCall(lat, lon) {
     })
     .then(function(data) {
         console.log(data)
-        weatherData = data;
+        displayCurrentInfo()
     })
     .catch(function(error) {
         alert(error)
     })
+
+
 }
 
-function displayCurrentInfo(info) {
-    $('h2')
-    .text(searchInput)
+function displayCurrentInfo() {
+    var cityDisplay = document.createElement('h2')
+    cityDisplay.innerText = cityName
+
+    currentInfoContainerEl.appendChild(cityDisplay)
     
 }
 
+function recentSearchHistory(input) {
+    // var searchObj = {};
+    // searchObj["city"] = input;
 
+    // console.log(searchObj)
+    // var index = searchHistory[4]
+
+    // if (searchHistory.length === 5) {
+    //     searchHistory.pop()
+    //     searchHistory.unshift(searchObj)
+    //     console.log(searchHistory)
+    // }
+    
+    if (searchHistory.length === 5) {
+        searchHistory.pop()
+        searchHistory.unshift()
+        console.log(searchHistory)
+    }
+
+
+
+    var recentSearchButton = document.createElement('button')
+    recentSearchButton.classList = "col-12 recentBtn"
+    recentSearchButton.innerText = cityName
+
+
+    recentSearchContainerEl.appendChild(recentSearchButton)
+}
 
 
 
