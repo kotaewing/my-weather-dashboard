@@ -1,4 +1,4 @@
-var searchHistory = [1,2,3,4,5]
+var searchHistory = []
 var cityName = "";
 var currentInfoContainerEl = document.getElementById("currentInfo")
 var recentSearchContainerEl = document.getElementById('cityStorage')
@@ -68,34 +68,49 @@ function displayCurrentInfo() {
     
 }
 
+function capitalize(letter) {
+    if (typeof letter !== 'string') return ''
+    return letter.charAt(0).toUpperCase() + letter.slice(1)
+}
+
+
 function recentSearchHistory(input) {
-    // var searchObj = {};
-    // searchObj["city"] = input;
 
-    // console.log(searchObj)
-    // var index = searchHistory[4]
-
-    // if (searchHistory.length === 5) {
-    //     searchHistory.pop()
-    //     searchHistory.unshift(searchObj)
-    //     console.log(searchHistory)
-    // }
-    
     if (searchHistory.length === 5) {
         searchHistory.pop()
-        searchHistory.unshift()
-        console.log(searchHistory)
+        searchHistory.unshift(input)
+    } else {
+        searchHistory.unshift(input);
     }
 
+    for (var i = 0; i < searchHistory.length; i++) {
+        localStorage.setItem('City ' + i, capitalize(searchHistory[i]))
+    }
 
+    createButtons(input);
+}
 
+function createButtons(input) {
     var recentSearchButton = document.createElement('button')
-    recentSearchButton.classList = "col-12 recentBtn"
-    recentSearchButton.innerText = cityName
+    recentSearchButton.classList = "col-12 btn-secondary"
+    recentSearchButton.innerText = capitalize(input);
 
 
     recentSearchContainerEl.appendChild(recentSearchButton)
 }
 
 
+function getSearchHistory() {
+    for (var i = 0; i < 5; i++) {
+        var itemKey = localStorage.getItem('City ' + i)
 
+        if (typeof itemKey === String) {
+            createButtons(itemKey)
+        } else {
+            return
+        }
+    }
+}
+
+getSearchHistory()
+console.log(searchHistory)
