@@ -10,6 +10,7 @@ function dateFormat(value) {
 }
 
 $('#submitSearch').on('click', function(event) {
+    $(weatherCardContainerEl).html('')
     event.preventDefault();
     var searchInputEl = $("#citySearch")
     var searchInput = $(searchInputEl).val().trim()
@@ -88,13 +89,19 @@ function displayCurrentInfo(data) {
 
 function displayWeatherCards(data) {
     $('#futureForecast').text("5 Day Forecast: ")
-    for (var i = 0; i < 5; i++) {
+    for (var i = 1; i < 6; i++) {
+        var weatherIcon = data.daily[i].weather[0].icon
+        var iconUrl = "http://openweathermap.org/img/w/" + weatherIcon + ".png";
         var col = $('<div>').addClass('col')
-        var card = $('<div>').addClass('card')
+        var card = $('<div>').addClass('card').attr('style', 'width: 10rem')
         var cardBody = $('<div>').addClass('card-body')
         var cardTitle = $('<h5>').text(dateFormat(data.daily[i].dt))
+        var cardIcon = $('<div>').append($('<img>').attr('src', iconUrl))
+        var cardTemp = $('<p>').text('Temp: ' + data.daily[i].temp.day + String.fromCharCode(176) + " F")
+        var cardWind = $('<p>').text('Wind: ' + data.daily[i].wind_speed + ' ' + 'MPH')
+        var cardHumidity = $('<p>').text('Humidity: ' + data.daily[i].humidity + String.fromCharCode(37))
         
-        $(cardBody).append(cardTitle)
+        $(cardBody).append(cardTitle, cardIcon, cardTemp, cardWind, cardHumidity)
         $(card).append(cardBody)
         $(col).append(card)
         $(weatherCardContainerEl).append(col)
