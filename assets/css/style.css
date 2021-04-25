@@ -60,3 +60,7 @@ hr.solid {
     background-color: red;
     border-radius: 10%;
 }
+
+#weatherCards {
+    margin: 20px;
+}

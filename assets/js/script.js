@@ -2,6 +2,7 @@ var searchHistory = []
 var cityName = "";
 var currentInfoContainerEl = document.getElementById("currentInfo")
 var recentSearchContainerEl = document.getElementById('cityStorage')
+var weatherCardContainerEl = $('#weatherCards')
 
 function dateFormat(value) {
     var dateString = moment.unix(value).format("MM/DD/YYYY");
@@ -57,6 +58,7 @@ function weatherCall(lat, lon) {
     .then(function(data) {
         console.log(data)
         displayCurrentInfo(data)
+        displayWeatherCards(data)
     })
     .catch(function(error) {
         alert(error)
@@ -64,6 +66,7 @@ function weatherCall(lat, lon) {
 
 
 }
+
 
 function displayCurrentInfo(data) {
     $('#currentInfo').addClass('currentInfo')
@@ -80,6 +83,21 @@ function displayCurrentInfo(data) {
         $('#uvIndexSpan').removeClass().addClass('moderate')
     } else {
         $('#uvIndexSpan').removeClass().addClass('severe')
+    }
+}
+
+function displayWeatherCards(data) {
+    $('#futureForecast').text("5 Day Forecast: ")
+    for (var i = 0; i < 5; i++) {
+        var col = $('<div>').addClass('col')
+        var card = $('<div>').addClass('card')
+        var cardBody = $('<div>').addClass('card-body')
+        var cardTitle = $('<h5>').text(dateFormat(data.daily[i].dt))
+        
+        $(cardBody).append(cardTitle)
+        $(card).append(cardBody)
+        $(col).append(card)
+        $(weatherCardContainerEl).append(col)
     }
 }
 
