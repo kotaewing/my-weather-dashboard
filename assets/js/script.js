@@ -3,6 +3,11 @@ var cityName = "";
 var currentInfoContainerEl = document.getElementById("currentInfo")
 var recentSearchContainerEl = document.getElementById('cityStorage')
 
+function dateFormat(value) {
+    var dateString = moment.unix(value).format("MM/DD/YYYY");
+    return dateString;
+}
+
 $('#submitSearch').on('click', function(event) {
     event.preventDefault();
     var searchInputEl = $("#citySearch")
@@ -51,7 +56,7 @@ function weatherCall(lat, lon) {
     })
     .then(function(data) {
         console.log(data)
-        displayCurrentInfo()
+        displayCurrentInfo(data)
     })
     .catch(function(error) {
         alert(error)
@@ -60,12 +65,22 @@ function weatherCall(lat, lon) {
 
 }
 
-function displayCurrentInfo() {
-    var cityDisplay = document.createElement('h2')
-    cityDisplay.innerText = cityName
+function displayCurrentInfo(data) {
+    $('#currentInfo').addClass('currentInfo')
+    $('#cityDisplay').text(cityName + ' - ' + dateFormat(data.current.dt))
+    $('#temp').text('Temp: ' + data.current.temp + String.fromCharCode(176) + " F")
+    $('#wind').text('Wind: ' + data.current.wind_speed + " MPH")
+    $('#humidity').text('Humidity: ' + data.current.humidity + String.fromCharCode(37))
+    $('#uvIndex').text('UV Index: ')
+    $('#uvIndexSpan').text(data.daily[0].uvi)
 
-    currentInfoContainerEl.appendChild(cityDisplay)
-    
+    if (data.daily[0].uvi < 4) {
+        $('#uvIndexSpan').removeClass().addClass('favorable')
+    } else if (data.daily[0].uvi < 8 && data.daily[0].uvi > 4) {
+        $('#uvIndexSpan').removeClass().addClass('moderate')
+    } else {
+        $('#uvIndexSpan').removeClass().addClass('severe')
+    }
 }
 
 function capitalize(letter) {
