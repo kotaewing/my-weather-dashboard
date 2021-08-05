@@ -9,61 +9,61 @@ function dateFormat(value) {
     return dateString;
 }
 
-$('#submitSearch').on('click', function(event) {
+$('#submitSearch').on('click', function (event) {
     $(weatherCardContainerEl).html('')
     event.preventDefault();
     var searchInputEl = $("#citySearch")
     var searchInput = $(searchInputEl).val().trim()
-    
+
     coordinateFinder(searchInput)
-   
+
     $(searchInputEl).val('')
-    
+
 });
 
 function coordinateFinder(searchInput) {
     var searchTest = "https://api.openweathermap.org/data/2.5/weather?q=" + searchInput + "&appid=92e0836afaeb6b857056f92c8fdb93c7";
 
-    fetch (searchTest)
-    .then(function(response) {
-        if (response.ok) {
-            return response.json()
-        } else {
-            alert("Something went wrong")
-        }
-    })
-    .then(function(data) {
-        var lat = data.coord.lat
-        var lon = data.coord.lon
-        
-        cityName = data.name
-        recentSearchHistory(searchInput)
-        
-        weatherCall(lat, lon);
-    })
-    .catch(function(error) {
-        alert(error)
-    })
+    fetch(searchTest)
+        .then(function (response) {
+            if (response.ok) {
+                return response.json()
+            } else {
+                alert("Something went wrong")
+            }
+        })
+        .then(function (data) {
+            var lat = data.coord.lat
+            var lon = data.coord.lon
+
+            cityName = data.name
+            recentSearchHistory(capitalize(searchInput))
+
+            weatherCall(lat, lon);
+        })
+        .catch(function (error) {
+            alert(error)
+        })
 }
 
 function weatherCall(lat, lon) {
     oneCallUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&units=imperial&exclude=minutely,hourly&appid=92e0836afaeb6b857056f92c8fdb93c7"
     fetch(oneCallUrl)
-    .then(function(response) {
-        if (response.ok) {
-            return response.json()
-        } else {
-            alert("Something went wrong")
-        }
-    })
-    .then(function(data) {
-        console.log(data)
-        displayCurrentInfo(data)
-        displayWeatherCards(data)
-    })
-    .catch(function(error) {
-        alert(error)
-    })
+        .then(function (response) {
+            if (response.ok) {
+                return response.json()
+            } else {
+                alert("Something went wrong")
+            }
+        })
+        .then(function (data) {
+            console.log(data)
+            displayCurrentInfo(data)
+            displayWeatherCards(data)
+        })
+        .catch(function (error) {
+            alert(error)
+        })
 
 
 }
@@ -100,7 +100,7 @@ function displayWeatherCards(data) {
         var cardTemp = $('<p>').text('Temp: ' + data.daily[i].temp.day + String.fromCharCode(176) + " F")
         var cardWind = $('<p>').text('Wind: ' + data.daily[i].wind_speed + ' ' + 'MPH')
         var cardHumidity = $('<p>').text('Humidity: ' + data.daily[i].humidity + String.fromCharCode(37))
-        
+
         $(cardBody).append(cardTitle, cardIcon, cardTemp, cardWind, cardHumidity)
         $(card).append(cardBody)
         $(col).append(card)
@@ -116,23 +116,22 @@ function capitalize(letter) {
 
 function recentSearchHistory(input) {
 
-    if (searchHistory.length === 5) {
-        searchHistory.pop()
-        searchHistory.unshift(input)
-    } else {
-        searchHistory.unshift(input);
+    if (!searchHistory.includes(capitalize(input))) {
+        searchHistory.push(input);
+        createButtons(input);
+        for (var i = 0; i < searchHistory.length; i++) {
+            localStorage.setItem('City ' + i, capitalize(searchHistory[i]))
+        }
     }
 
-    for (var i = 0; i < searchHistory.length; i++) {
-        localStorage.setItem('City ' + i, capitalize(searchHistory[i]))
-    }
+    localStorage.setItem('search-history', searchHistory)
 
-    createButtons(input);
 }
 
 function createButtons(input) {
     var recentSearchButton = document.createElement('button')
-    recentSearchButton.classList = "col-12 btn-secondary"
+    recentSearchButton.classList = "col-12 btn-secondary search"
+    recentSearchButton.setAttribute('data-city', input)
     recentSearchButton.innerText = capitalize(input);
 
 
@@ -141,16 +140,25 @@ function createButtons(input) {
 
 
 function getSearchHistory() {
-    for (var i = 0; i < 5; i++) {
-        var itemKey = localStorage.getItem('City ' + i)
+    var savedSearchHistory = localStorage.getItem('search-history').split(',')
+    console.log(savedSearchHistory.length)
 
-        if (typeof itemKey === String) {
-            createButtons(itemKey)
-        } else {
-            return
-        }
+    searchHistory = savedSearchHistory
+
+    for (var i = 0; i < savedSearchHistory.length; i++) {
+        var itemKey = savedSearchHistory[i]
+        createButtons(itemKey)
     }
 }
 
+recentSearchContainerEl.addEventListener('click', (e) => {
+    var btnVal = e.target
+    if (btnVal.tagName === 'BUTTON') {
+        coordinateFinder(btnVal.getAttribute('data-city'))
+    }
+
+})
+
+
+
 getSearchHistory()
-console.log(searchHistory)
