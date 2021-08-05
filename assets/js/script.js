@@ -88,6 +88,7 @@ function displayCurrentInfo(data) {
 }
 
 function displayWeatherCards(data) {
+    $(weatherCardContainerEl).empty();
     $('#futureForecast').text("5 Day Forecast: ")
     for (var i = 1; i < 6; i++) {
         var weatherIcon = data.daily[i].weather[0].icon
